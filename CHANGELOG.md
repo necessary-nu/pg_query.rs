@@ -3,6 +3,9 @@
 ## 18.0.0   2026-09-01
 
 * Upgrade to Postgres 18.6 (libpg_query 18.1.0)
+  - Security fix: heap out-of-bounds write and read in `normalize`
+    ([GHSA-6ggm-xmc9-8ffg](https://github.com/pganalyze/libpg_query/security/advisories/GHSA-6ggm-xmc9-8ffg)),
+    the libpg_query 18.1.0 counterpart of the fix in 6.2.1
   - Performance: libpg_query now uses upb instead of protobuf-c for
     serialization, which is substantially faster thanks to its built-in arena
     allocation, resulting in 2x faster runtime.
@@ -60,7 +63,9 @@
   consistently with other deeply nested nodes. Use
   `FingerprintOptions::RANGEVAR_PG17_COMPAT` for Postgres 17 compatible
   fingerprints. See the "Fingerprinting a query" section in the README for
-  details and examples.
+  details and examples. Statements with a `RETURNING` clause fingerprint
+  differently from libpg_query 17 even with `RANGEVAR_PG17_COMPAT`, because
+  Postgres 18 wraps the returning list in a `ReturningClause` node.
 * **Breaking**: protobuf message structure follows the Postgres 18 parse tree;
   this is an incomplete list of notable changes:
   - `SinglePartitionSpec` message removed (and its variants from `NodeEnum`,
